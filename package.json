@@ -1,6 +1,6 @@
 {
-  "name": "multer-s3-with-transforms",
-  "version": "2.9.0",
+  "name": "multer-s3-v2",
+  "version": "2.1.0",
   "description": "Streaming multer storage engine for AWS S3 with file transform",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Aeonrush/multer-s3-with-transforms.git"
+    "url": "git+https://github.com/Aeonrush/multer-s3-v2.git"
   },
   "keywords": [
     "multer",
@@ -18,12 +18,12 @@
     "transforms",
     "sharp"
   ],
-  "author": "badunk",
+  "author": "akash gupta",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Aeonrush/multer-s3-with-transforms/issues"
+    "url": "https://github.com/techaks/multer-s3-v2/issues"
   },
-  "homepage": "https://github.com/Aeonrush/multer-s3-with-transforms#readme",
+  "homepage": "https://github.com/techaks/multer-s3-v2#readme",
   "dependencies": {
     "file-type": "^3.3.0",
     "is-svg": "^2.1.0",
