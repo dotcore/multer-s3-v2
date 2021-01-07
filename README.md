@@ -32,7 +32,8 @@ var upload = multer({
     },
     key: function(req, file, cb) {
       cb(null, Date.now().toString());
-    }
+    },
+    throwMimeTypeConflictErrors: true
   })
 });
 
@@ -262,6 +263,12 @@ var opts = {
   }
 };
 ```
+
+## Other Options
+
+### `throwMimeTypeConflictErrors: boolean?`
+
+If enabled, this will result in an exception (instead of an upload) when the mime-type reported by package [file-type](https://www.npmjs.com/package/file-type) does not match the mime-type encoded in the multi-part form data for a given file (see tests for example).
 
 ## Testing
 

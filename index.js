@@ -1,11 +1,11 @@
-var crypto = require('crypto')
-var stream = require('stream')
-var fileType = require('file-type')
-var isSvg = require('is-svg')
-var parallel = require('run-parallel')
+const { randomBytes } = require('crypto')
+const { PassThrough } = require('stream')
+const { fromBuffer } = require('file-type')
+const isSvg = require('is-svg')
+const parallel = require('run-parallel')
 
 function staticValue (value) {
-  return function (req, file, cb) {
+  return function (_req, _file, cb) {
     cb(null, value)
   }
 }
@@ -20,15 +20,15 @@ var defaultStorageClass = staticValue('STANDARD')
 var defaultSSE = staticValue(null)
 var defaultSSEKMS = staticValue(null)
 
-function defaultKey (req, file, cb) {
-  crypto.randomBytes(16, function (err, raw) {
+function defaultKey (_req, _file, cb) {
+  randomBytes(16, function (err, raw) {
     cb(err, err ? undefined : raw.toString('hex'))
   })
 }
 
 function autoContentType (req, file, cb) {
-  file.stream.once('data', function (firstChunk) {
-    var type = fileType(firstChunk)
+  file.stream.once('data', async function (firstChunk) {
+    var type = await fromBuffer(firstChunk)
     var mime
 
     if (type) {
@@ -39,7 +39,7 @@ function autoContentType (req, file, cb) {
       mime = 'application/octet-stream'
     }
 
-    var outStream = new stream.PassThrough()
+    var outStream = new PassThrough()
 
     outStream.write(firstChunk)
     file.stream.pipe(outStream)
@@ -155,6 +155,7 @@ function S3Storage (opts) {
     default: throw new TypeError('Expected opts.sseKmsKeyId to be undefined, string, or function')
   }
 
+  this.throwMimeTypeConflictErrors = opts.throwMimeTypeConflictErrors
   this.transforms = opts.transforms
 }
 
@@ -186,6 +187,10 @@ S3Storage.prototype._handleFile = function (req, file, cb) {
 
     if (opts.contentDisposition) {
       params.ContentDisposition = opts.contentDisposition
+    }
+
+    if (this.throwMimeTypeConflictErrors && (file.mimetype !== opts.contentType)) {
+      return cb(new Error(`MIMETYPE_MISMATCH: Actual content-type "${opts.contentType}" does not match the mime-type "${file.mimetype}" assumed by the file extension for file "${file.originalname}"`))
     }
 
     var upload = this.s3.upload(params)
