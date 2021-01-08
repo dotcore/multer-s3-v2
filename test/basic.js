@@ -177,7 +177,7 @@ describe('Multer S3', function () {
     })
   })
 
-  it('does not upload a file with incorrect content-type when option "throwMimeTypeConflictErrors" is true', function (done) {
+  it('does not upload a binary file with incorrect content-type when option "throwMimeTypeConflictErrors" is true', function (done) {
     var s3 = mockS3()
     var form = new FormData()
     var storage = multerS3({ s3: s3, bucket: 'test', serverSideEncryption: 'aws:kms', contentType: multerS3.AUTO_CONTENT_TYPE, throwMimeTypeConflictErrors: true })
@@ -190,6 +190,35 @@ describe('Multer S3', function () {
 
     submitForm(parser, form, function (err, req) {
       assert.strict.equal(err.message, 'MIMETYPE_MISMATCH: Actual content-type "image/png" does not match the mime-type "application/pdf" assumed by the file extension for file "actually-a-png.pdf"')
+      done()
+    })
+  })
+
+  it('does upload a file with content-type "application/octet-stream" and correct file-extension when option "throwMimeTypeConflictErrors" is true', function (done) {
+    var s3 = mockS3()
+    var form = new FormData()
+    var storage = multerS3({ s3: s3, bucket: 'test', serverSideEncryption: 'aws:kms', contentType: multerS3.AUTO_CONTENT_TYPE, throwMimeTypeConflictErrors: true })
+    var upload = multer({ storage: storage })
+    var parser = upload.single('file')
+    var image = fs.createReadStream(path.join(__dirname, 'files', 'test.txt'))
+
+    form.append('name', 'Multer')
+    form.append('file', image)
+
+    submitForm(parser, form, function (err, req) {
+      assert.ifError(err)
+
+      assert.strict.equal(req.body.name, 'Multer')
+
+      assert.strict.equal(req.file.fieldname, 'file')
+      assert.strict.equal(req.file.contentType, 'application/octet-stream')
+      assert.strict.equal(req.file.originalname, 'test.txt')
+      assert.strict.equal(req.file.size, 5)
+      assert.strict.equal(req.file.bucket, 'test')
+      assert.strict.equal(req.file.etag, 'mock-etag')
+      assert.strict.equal(req.file.location, 'mock-location')
+      assert.strict.equal(req.file.serverSideEncryption, 'aws:kms')
+
       done()
     })
   })
