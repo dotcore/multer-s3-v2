@@ -189,7 +189,7 @@ S3Storage.prototype._handleFile = function (req, file, cb) {
       params.ContentDisposition = opts.contentDisposition
     }
 
-    if (this.throwMimeTypeConflictErrors && (file.mimetype !== opts.contentType)) {
+    if (this.throwMimeTypeConflictErrors && (opts.contentType !== 'application/octet-stream') && (file.mimetype !== opts.contentType)) {
       return cb(new Error(`MIMETYPE_MISMATCH: Actual content-type "${opts.contentType}" does not match the mime-type "${file.mimetype}" assumed by the file extension for file "${file.originalname}"`))
     }
 
