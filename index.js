@@ -1,6 +1,5 @@
 const { randomBytes } = require('crypto')
 const { PassThrough } = require('stream')
-const { fromBuffer } = require('file-type')
 const isSvg = require('is-svg')
 const parallel = require('run-parallel')
 
@@ -10,15 +9,15 @@ function staticValue (value) {
   }
 }
 
-var defaultAcl = staticValue('private')
-var defaultContentType = staticValue('application/octet-stream')
+const defaultAcl = staticValue('private')
+const defaultContentType = staticValue('application/octet-stream')
 
-var defaultMetadata = staticValue(null)
-var defaultCacheControl = staticValue(null)
-var defaultContentDisposition = staticValue(null)
-var defaultStorageClass = staticValue('STANDARD')
-var defaultSSE = staticValue(null)
-var defaultSSEKMS = staticValue(null)
+const defaultMetadata = staticValue(null)
+const defaultCacheControl = staticValue(null)
+const defaultContentDisposition = staticValue(null)
+const defaultStorageClass = staticValue('STANDARD')
+const defaultSSE = staticValue(null)
+const defaultSSEKMS = staticValue(null)
 
 function defaultKey (_req, _file, cb) {
   randomBytes(16, function (err, raw) {
@@ -28,8 +27,9 @@ function defaultKey (_req, _file, cb) {
 
 function autoContentType (req, file, cb) {
   file.stream.once('data', async function (firstChunk) {
-    var type = await fromBuffer(firstChunk)
-    var mime
+    const { fileTypeFromBuffer } = await import('file-type')
+    const type = await fileTypeFromBuffer(firstChunk)
+    let mime
 
     if (type) {
       mime = type.mime
@@ -39,7 +39,7 @@ function autoContentType (req, file, cb) {
       mime = 'application/octet-stream'
     }
 
-    var outStream = new PassThrough()
+    const outStream = new PassThrough()
 
     outStream.write(firstChunk)
     file.stream.pipe(outStream)
@@ -163,16 +163,16 @@ S3Storage.prototype._handleFile = function (req, file, cb) {
   collect(this, req, file, function (err, opts) {
     if (err) return cb(err)
 
-    var currentSize = 0
+    let currentSize = 0
 
-    var transform = !this.transforms ? null : typeof this.transforms === 'function' ? this.transforms() : this.transforms[file.fieldname]()
+    const transform = !this.transforms ? null : typeof this.transforms === 'function' ? this.transforms() : this.transforms[file.fieldname]()
 
-    var fileStream = opts.replacementStream || file.stream
+    let fileStream = opts.replacementStream || file.stream
     if (transform) {
       fileStream = fileStream.pipe(transform)
     }
 
-    var params = {
+    const params = {
       Bucket: opts.bucket,
       Key: opts.key,
       ACL: opts.acl,
@@ -193,7 +193,7 @@ S3Storage.prototype._handleFile = function (req, file, cb) {
       return cb(new Error(`MIMETYPE_MISMATCH: Actual content-type "${opts.contentType}" does not match the mime-type "${file.mimetype}" assumed by the file extension for file "${file.originalname}"`))
     }
 
-    var upload = this.s3.upload(params)
+    const upload = this.s3.upload(params)
 
     upload.on('httpUploadProgress', function (ev) {
       if (ev.total) currentSize = ev.total

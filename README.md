@@ -13,17 +13,17 @@ npm install --save multer-s3-v2
 ## Usage
 
 ```javascript
-var aws = require("aws-sdk");
-var express = require("express");
-var multer = require("multer");
-var multerS3 = require("multer-s3-v2");
+const aws = require("aws-sdk");
+const express = require("express");
+const multer = require("multer");
+const multerS3 = require("multer-s3-v2");
 
-var app = express();
-var s3 = new aws.S3({
+const app = express();
+const s3 = new aws.S3({
   /* ... */
 });
 
-var upload = multer({
+const upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: "some-bucket",
@@ -65,7 +65,7 @@ Each file contains the following information exposed by `multer-s3`:
 [ACL values](http://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl) can be set by passing an optional `acl` parameter into the `multerS3` object.
 
 ```javascript
-var upload = multer({
+const upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: "some-bucket",
@@ -97,7 +97,7 @@ The `metadata` option is a callback that accepts the request and file, and retur
 Here is an example that stores all fields in the request body as metadata, and uses an `id` param as the key:
 
 ```javascript
-var opts = {
+const opts = {
   s3: s3,
   bucket: config.originalsBucket,
   metadata: function(req, file, cb) {
@@ -116,7 +116,7 @@ The optional `cacheControl` option sets the `Cache-Control` HTTP header that wil
 Here is an example that will tell browsers and CDNs to cache the file for one year:
 
 ```javascript
-var upload = multer({
+const upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: "some-bucket",
@@ -133,7 +133,7 @@ var upload = multer({
 The optional `contentType` option can be used to set Content/mime type of the file. By default the content type is set to `application/octet-stream`. If you want multer-s3 to automatically find the content-type of the file, use the `multerS3.AUTO_CONTENT_TYPE` constant. Here is an example that will detect the content type of the file being uploaded.
 
 ```javascript
-var upload = multer({
+const upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: "some-bucket",
@@ -152,7 +152,7 @@ You may also use a function as the `contentType`, which should be of the form `f
 [storageClass values](https://aws.amazon.com/s3/storage-classes/) can be set by passing an optional `storageClass` parameter into the `multerS3` object.
 
 ```javascript
-var upload = multer({
+const upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: "some-bucket",
@@ -170,7 +170,7 @@ var upload = multer({
 The optional `contentDisposition` option can be used to set the `Content-Disposition` header for the uploaded file. By default, the `contentDisposition` isn't forwarded. As an example below, using the value `attachment` forces the browser to download the uploaded file instead of trying to open it.
 
 ```javascript
-var upload = multer({
+const upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: "some-bucket",
@@ -192,7 +192,7 @@ You may use the S3 server-side encryption functionality via the optional `server
 `serverSideEncryption` has two valid values: 'AES256' and 'aws:kms'. 'AES256' utilizes the S3-managed key system, while 'aws:kms' utilizes the AWS KMS system and accepts the optional `sseKmsKeyId` parameter to specify the key ID of the key you wish to use. Leaving `sseKmsKeyId` blank when 'aws:kms' is specified will use the default KMS key. **Note:** _You must instantiate the S3 instance with `signatureVersion: 'v4'` in order to use KMS-managed keys [[Docs]](http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingAWSSDK.html#specify-signature-version), and the specified key must be in the same AWS region as the S3 bucket used._
 
 ```javascript
-var upload = multer({
+const upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: "some-bucket",
@@ -213,9 +213,9 @@ The `transforms` option is a function or object with field.
 Here is an example with simple transform as function:
 
 ```javascript
-var sharp = require("sharp");
+const sharp = require("sharp");
 
-var opts = {
+const opts = {
   s3: s3,
   bucket: config.originalsBucket,
   transforms: () =>
@@ -239,9 +239,9 @@ var opts = {
 And here is exemple with field specific transform:
 
 ```javascript
-var sharp = require("sharp");
+const sharp = require("sharp");
 
-var opts = {
+const opts = {
   s3: s3,
   bucket: config.originalsBucket,
   transforms: {
